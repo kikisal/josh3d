@@ -1,3 +1,2 @@
 export * from './math';
-
-console.log("test running.");
+export * from './misc';

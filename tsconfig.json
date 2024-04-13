@@ -9,6 +9,5 @@
     "jsx": "react",
     "allowJs": true,
     "moduleResolution": "node"
-    // asd
   }
 }
