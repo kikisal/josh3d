@@ -313,10 +313,17 @@ function drawTriangles(triangles: Triangle[]) {
                 fragment.setGlobalIndex(i + boundingBox.pos.y, j + boundingBox.pos.x);
                 
                 if (A.x >= 0 && A.y >= 0 && A.y + A.x <= 1) {
-                    // const col = bariInterp(col1, col2, col3, A.x, A.y); // interpolated attribute
+                    
+                    // interpolated col attribute
+                    const col = bariInterp(col1, col2, col3, A.x, A.y); 
+
+                    // interpolated uv attribute
                     const uvCoord = bariInterp(uv1, uv2, uv3, A.x, A.y);
 
-                    fragment.setColor(sampleFromImage(uvCoord, imageTable['dog']));
+                   // fragment.setColor(sampleFromImage(uvCoord, imageTable['dog']));
+
+                    fragment.setColor(Vector3.create(uvCoord.x, uvCoord.y, 0));
+                    
                     fragment.discard(false);
                 }
 

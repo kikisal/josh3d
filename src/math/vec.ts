@@ -190,7 +190,7 @@ export function vec_argnzero(v: Vector3 | Vector2) {
 export type Vec = Vector2 | Vector3;
 
 // return a*(p2-p1) + b*(p3-p1) + p1;
-export function bariInterp(p1: Vec, p2: Vec, p3: Vec, a: number, b: number) {
+export function bariInterp(p1: Vec, p2: Vec, p3: Vec, a: number, b: number) : Vec {
     const q1 = p2.minus(p1 as any);
     const q2 = p3.minus(p1 as any);
     return ((q1.scalarMul(a) as any).sum(q2.scalarMul(b))).sum(p1 as any);
