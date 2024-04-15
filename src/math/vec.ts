@@ -1,8 +1,14 @@
+import { Mat2 } from "./matrix";
+
 export class Vector3 {
 
     x: number;
     y: number;
     z: number;
+
+    components: number = 3;
+    
+    static LABELS = ['x', 'y', 'z'];
     
     constructor(x = 0, y = 0, z = 0) {
         this.x = x;
@@ -12,6 +18,14 @@ export class Vector3 {
 
     scalarMul(s) {
         return Vector3.scalarMul(this, s);
+    }
+
+    minus(v: Vector3) {
+        return  Vector3.diff(this, v);
+    }
+
+    sum(v: Vector3) {
+        return Vector3.sum(this, v);
     }
 
     sumAll() {
@@ -85,6 +99,10 @@ export class Vector2 {
     x: number;
     y: number;
 
+    components: number = 2;
+
+    static LABELS = ['x', 'y'];
+
     constructor(x = 0, y = 0) {
         this.x = x;
         this.y = y;
@@ -93,6 +111,19 @@ export class Vector2 {
     sumAll() {
         return this.x + this.y;
     }
+
+    minus(v: Vector2) {
+        return Vector2.diff(this, v);
+    }
+    
+    scalarMul(s) {
+        return Vector2.scalarMul(this, s);
+    }
+
+    sum(v: Vector2) {
+        return Vector2.sum(this, v);
+    }
+
 
     normalize() {
         return Vector2.scalarMul(this, 1 / Vector2.len(this));
@@ -143,4 +174,75 @@ export class Vector2 {
     static len(v1) {
         return Math.sqrt(Vector2.dot(v1, v1));
     }
+}
+
+
+export function vec_argnzero(v: Vector3 | Vector2) {
+    const labels = Object.keys(v);
+    for (let i = 0; i < v.components; ++i)
+        if (v[labels[i]] != 0)
+            return i;
+
+    return -1;
+}
+
+
+export type Vec = Vector2 | Vector3;
+
+// return a*(p2-p1) + b*(p3-p1) + p1;
+export function bariInterp(p1: Vec, p2: Vec, p3: Vec, a: number, b: number) {
+    const q1 = p2.minus(p1 as any);
+    const q2 = p3.minus(p1 as any);
+    return ((q1.scalarMul(a) as any).sum(q2.scalarMul(b))).sum(p1 as any);
+}
+
+
+// maps r from one space to the other (usually to get baricentric coordinates)
+export function bariCoordsMap(p1: Vector2, p2: Vector2, p3: Vector2, r: Vector2) {
+  
+    const result = Vector2.create(NaN, NaN); 
+
+    const q1 = Vector2.diff(p2, p1);
+    const q2 = Vector2.diff(p3, p1);
+
+    const k = vec_argnzero(q1);
+
+    
+    if (k < 0)
+        return result;
+
+    const labels = ['x', 'y'];
+    const label = labels[k];
+
+    const rk  = r [label];
+    const p1k = p1[label];
+    const q1k = q1[label];
+    const q2k = q2[label];
+
+    const M1 = Mat2.create(
+        [
+            q2.x, q2.y,
+            q1.x, q1.y
+        ]
+    );
+
+    const det = M1.det();
+
+    if (det == 0)
+        return result;
+
+    // intermediate vectors for computation
+    const K1 = Vector2.create(q1.y, -q1.x);
+    const K2 = Vector2.create(-q1.x*q1.y, q1.x);
+
+    const D = Vector2.dot(K1, r) + Vector2.dot(K2, p1); 
+
+
+    const beta      = D / det;
+    const alphish   = det * (rk - p1k) - q2k * D;
+
+    result.x = alphish / (q1k * det);
+    result.y = beta;
+
+    return result;
 }
