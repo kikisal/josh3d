@@ -1,6 +1,24 @@
 import { Mat2 } from "./matrix";
 
-export class Vector3 {
+export interface IVector3 {
+    x: number;
+    y: number;
+    z: number;
+    
+    components?: number;
+
+    toVec2(): IVector2;
+}
+
+export interface IVector2 {
+    x: number;
+    y: number;
+
+    components?: number;
+}
+
+
+export class Vector3 implements IVector3 {
 
     x: number;
     y: number;
@@ -14,6 +32,10 @@ export class Vector3 {
         this.x = x;
         this.y = y;
         this.z = z;
+    }
+
+    toVec2(): IVector2 {
+        return Vector2.create(this.x, this.y);
     }
 
     scalarMul(s) {
@@ -95,7 +117,7 @@ export class Vector3 {
     }
 }
 
-export class Vector2 {
+export class Vector2 implements IVector2 {
     x: number;
     y: number;
 
